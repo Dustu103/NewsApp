@@ -1,15 +1,11 @@
-import React, { useRef, useContext } from "react";
-import Link from "next/link";
-// import NewsContext from
-import { useNews } from "../NewsContext"; // Import your NewsContext
+import React, { useRef } from "react";
 
-const Card = ({ photo_url, title, item }) => {
+const FullScreenCard = ({item }) => {
   const cardRef = useRef(null);
   const glowRef = useRef(null);
   const contentRef = useRef(null);
-  
+
   // Access setSelectedNews from the context
-  const { setSelectedNews } = useNews();
 
   const handleMouseMove = (e) => {
     const card = cardRef.current;
@@ -31,19 +27,9 @@ const Card = ({ photo_url, title, item }) => {
     card.style.transform = `perspective(1000px) rotateY(${percentX * 10}deg) rotateX(${percentY * 10}deg)`;
     content.style.transform = `translateZ(50px)`;
     glow.style.opacity = "1";
-    glow.style.backgroundImage = `
-      radial-gradient(
-        circle at ${x}px ${y}px,
-        #ffffff44,
-        #0000000f
-      )
-    `;
+    glow.style.backgroundImage = `radial-gradient(circle at ${x}px ${y}px, #ffffff44, #0000000f)`;
   };
 
-  const handleClick = () => {
-    console.log(item);
-    setSelectedNews(item); // Store the selected item in the context
-  };
 
   const handleMouseLeave = () => {
     const card = cardRef.current;
@@ -57,11 +43,30 @@ const Card = ({ photo_url, title, item }) => {
     glow.style.opacity = "0";
   };
 
+  const dateFormat = (isoDate) => {
+    const date = new Date(isoDate); // Convert the ISO string to a Date object
+    
+    // Use toLocaleString() to format it to a readable string
+    const formattedDate = date.toLocaleString("en-US", {
+      weekday: "long", // Full weekday name
+      year: "numeric",
+      month: "long", // Full month name
+      day: "numeric",
+      hour: "2-digit",
+      minute: "2-digit",
+      second: "2-digit",
+      hour12: true, // 12-hour format with AM/PM
+    });
+  
+    return formattedDate; // Return the formatted date
+  };
+  
   return (
-    <div className="bg-transparent flex items-center justify-center overflow-hidden">
+    <div className="bg-transparent flex items-center justify-center overflow-hidden m-8">
+        {console.log(item)}
       <div
         ref={cardRef}
-        className="tilt-card w-80 h-96 bg-gradient-to-br from-gray-900 via-black to-gray-800 rounded-2xl shadow-xl relative cursor-pointer transition-all duration-300 ease-out hover:scale-105 group overflow-hidden"
+        className="tilt-card w-full h-screen bg-gradient-to-br from-gray-900 via-black to-gray-800 rounded-2xl shadow-xl relative cursor-pointer transition-all duration-300 ease-out hover:scale-105 group overflow-hidden m-8"
         onMouseMove={handleMouseMove}
         onMouseLeave={handleMouseLeave}
       >
@@ -77,24 +82,28 @@ const Card = ({ photo_url, title, item }) => {
           ref={contentRef}
           className="tilt-card-content p-6 flex flex-col h-full justify-between relative z-10"
         >
+          <div className="m-4">
+            <img src={item?.photo_url} alt={item?.title} className="w-full h-96 rounded-lg" />
+            <div className="text-white mt-1">
+            <h1 className="text-3xl font-bold">{item?.title}</h1>
+          </div>
           <div>
-            <img src={photo_url} alt={title} />
+            <p>Source Name : {item?.source_name}</p>
+            <p>News Link : <a href={item?.link}>{item?.link}</a></p>
           </div>
-          <div className="space-y-4 text-white">
-            <p>{title}</p>
-            <Link href={`/full-news`}>
-              <button
-                className="block w-full py-2 bg-gradient-to-br from-gray-900 via-black to-gray-800 rounded-lg font-semibold transform transition hover:scale-105 active:scale-95 text-blue-600 text-center"
-                onClick={handleClick} // On click, set the selected news
-              >
-                More...
-              </button>
-            </Link>
+          <div>
+            <div>
+            date : {dateFormat(item?.
+published_datetime_utc)
+}  :: </div>
+            {item?.snippet}
           </div>
+          </div>
+          
         </div>
       </div>
     </div>
   );
 };
 
-export default Card;
+export default FullScreenCard;
